@@ -2,7 +2,7 @@ package model
 
 type Produk struct {
 	ID    int    `json:"id"`
-	Nama  string `json:"nama"`
+	Name  string `json:"name"`
 	Price int    `json:"price"`
 	Stock int    `json:"stock"`
 }

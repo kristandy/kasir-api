@@ -25,7 +25,7 @@ func (reps *ProductRepository) GetProducts() ([]model.Produk, error) {
 	products := make([]model.Produk, 0)
 	for rows.Next() {
 		var p model.Produk
-		err := rows.Scan(&p.ID, &p.Nama, &p.Price, &p.Stock)
+		err := rows.Scan(&p.ID, &p.Name, &p.Price, &p.Stock)
 		if err != nil {
 			return nil, err
 		}
@@ -35,8 +35,8 @@ func (reps *ProductRepository) GetProducts() ([]model.Produk, error) {
 }
 
 func (reps *ProductRepository) CreateProduct(product *model.Produk) error {
-	query := "insert into products (name, price, stock) values ($1, $2, $3) returnin id"
-	err := reps.db.QueryRow(query, product.Nama, product.Price, product.Stock).Scan(&product.ID)
+	query := "insert into products (name, price, stock) values ($1, $2, $3) returning id"
+	err := reps.db.QueryRow(query, product.Name, product.Price, product.Stock).Scan(&product.ID)
 	return err
 }
 
@@ -44,7 +44,7 @@ func (repo *ProductRepository) GetByID(id int) (*model.Produk, error) {
 	query := "SELECT id, name, price, stock FROM products WHERE id = $1"
 
 	var p model.Produk
-	err := repo.db.QueryRow(query, id).Scan(&p.ID, &p.Nama, &p.Price, &p.Stock)
+	err := repo.db.QueryRow(query, id).Scan(&p.ID, &p.Name, &p.Price, &p.Stock)
 	if err == sql.ErrNoRows {
 		return nil, errors.New("produk tidak ditemukan")
 	}
@@ -57,7 +57,7 @@ func (repo *ProductRepository) GetByID(id int) (*model.Produk, error) {
 
 func (repo *ProductRepository) Update(product *model.Produk) error {
 	query := "UPDATE products SET name = $1, price = $2, stock = $3 WHERE id = $4"
-	result, err := repo.db.Exec(query, product.Nama, product.Price, product.Stock, product.ID)
+	result, err := repo.db.Exec(query, product.Name, product.Price, product.Stock, product.ID)
 	if err != nil {
 		return err
 	}
