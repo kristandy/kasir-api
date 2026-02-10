@@ -46,10 +46,14 @@ func main() {
 	transactionService := services.NewTransactionService(transactionRepo)
 	transactionHandler := handlers.NewTransactionHandler(transactionService)
 
+	reportReps := repositories.NewReportRepository(db)
+	reportService := services.NewReportService(reportReps)
+	reportHandler := handlers.NewReportHandler(reportService)
+
 	http.HandleFunc("/api/produk", productHandler.HandleProducts)
 	http.HandleFunc("/api/produk/", productHandler.HandleProductByID)
 	http.HandleFunc("/api/checkout", transactionHandler.HandleCheckout)
-
+	http.HandleFunc("/api/report/", reportHandler.HandleReport)
 	fmt.Println("Server running di localhost:" + config.Port)
 
 	err = http.ListenAndServe(":"+config.Port, nil)
