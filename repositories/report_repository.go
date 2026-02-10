@@ -16,20 +16,15 @@ func NewReportRepository(db *sql.DB) *ReportRepository {
 
 func (reps *ReportRepository) FetchReport(dateFrom, dateTo time.Time) (*model.ReportDetail, error) {
 	var report model.ReportDetail
-	rp, err := reps.db.Begin()
-	if err != nil {
-		return nil, err
-	}
-	defer rp.Rollback()
 
 	query := `
 	select
-		sum(total_amount) as total_revenue,
+		coalesce(sum(total_amount),0) as total_revenue,
 		count(id) as total_transactions
 	from transactions
 	where created_at between $1 and $2`
 
-	err = reps.db.QueryRow(query, dateFrom, dateTo).Scan(&report.TotalRevenue, &report.TotalTransactions)
+	err := reps.db.QueryRow(query, dateFrom, dateTo).Scan(&report.TotalRevenue, &report.TotalTransactions)
 	if err != nil {
 		return nil, err
 	}
@@ -40,25 +35,25 @@ func (reps *ReportRepository) FetchReport(dateFrom, dateTo time.Time) (*model.Re
 		,sum(B.quantity) as qty_sold
 	from products A
 	join transaction_details B on A.id = B.product_id
-	where B.quantity = (
-		select max(quantity)
-		from transaction_details
-	)
-	group by A.Name`
+	join transactions C on B.transaction_id = C.id
+	where C.created_at between $1 and $2
+	group by A.Name
+	order by qty_sold desc
+	limit 1`
 
 	var product_name string
 	var qty_sold int
 
 	err = reps.db.QueryRow(queryTerlaris, dateFrom, dateTo).Scan(&product_name, &qty_sold)
 	if err == nil {
-		report.ProdukTerlaris = []model.TransactionDetail{
+		report.ProdukTerlaris = []model.ProductTerlaris{
 			{
 				ProductName: product_name,
 				Quantity:    qty_sold,
 			},
 		}
 	} else {
-		report.ProdukTerlaris = []model.TransactionDetail{}
+		report.ProdukTerlaris = []model.ProductTerlaris{}
 	}
 	return &report, nil
 }

@@ -35,12 +35,17 @@ type CheckoutRequest struct {
 }
 
 type ReportDetail struct {
-	TotalRevenue      int                 `json:"total_revenue"`
-	TotalTransactions int                 `json:"total_transactions"`
-	ProdukTerlaris    []TransactionDetail `json:"produk_terlaris"`
+	TotalRevenue      int               `json:"total_revenue"`
+	TotalTransactions int               `json:"total_transactions"`
+	ProdukTerlaris    []ProductTerlaris `json:"produk_terlaris"`
 }
 
 type ReportRequest struct {
 	DateFrom string `json:"date_from"`
 	DateTo   string `json:"date_to"`
+}
+
+type ProductTerlaris struct {
+	ProductName string `json:"product_name"`
+	Quantity    int    `json:"qty_sold"`
 }

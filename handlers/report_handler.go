@@ -25,8 +25,8 @@ func (h *ReportHandler) HandleReport(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ReportHandler) GenerateReport(w http.ResponseWriter, r *http.Request) {
-	dateFromString := r.URL.Query().Get("date_from")
-	dateToString := r.URL.Query().Get("date_to")
+	dateFromString := r.URL.Query().Get("dateFrom")
+	dateToString := r.URL.Query().Get("dateTo")
 
 	var dateFrom, dateTo time.Time
 	var err error
